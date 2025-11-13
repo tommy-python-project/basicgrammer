@@ -1,0 +1,43 @@
+"""
+数据库操作协议拓展
+"""
+from typing import Protocol, Any, Dict, Optional, List
+
+
+# 基础CRUD操作
+class Repository(Protocol):
+
+    def create(self,data:Dict[str,Any]) -> Any: ...
+
+    def read(self,id: Any) -> Optional[Dict[str, Any]]: ...
+
+    def update(self, id: Any, data: Dict[str, Any]) -> bool: ...
+
+    def delete(self, id: Any) -> bool: ...
+
+
+# 拓展： 查询功能
+class QueryableRepository(Repository,Protocol):
+    def find_all(self) -> List[Dict[str,Any]]: ...
+
+    def find_by(self,**filters) -> List[Dict[str, Any]]: ...
+
+    def count(self,**filters) -> int: ...
+
+
+# 拓展： 事务支持
+class TransactionalRepository(QueryableRepository,Protocol):
+    def begin_transaction(self) -> None: ...
+
+    def commit(self) -> None: ...
+
+    def rollback(self) -> None: ...
+
+# 扩展：批量操作
+class BulkOperationsRepository(TransactionalRepository, Protocol):
+
+    def bulk_create(self,items:List[Dict[str,Any]]) -> List[Any]: ...
+
+    def bulk_update(self,updates:Dict[Any, Dict[str, Any]]) -> int:...
+
+    def bulk_delete(self,ids: List[Any]) -> int: ...
