@@ -1,0 +1,51 @@
+{% comment %} myapp/templates/myapp/article_detail.html {% endcomment %}
+{% extends "base.html" %} {# 假设你有一个基础模板 #}
+
+{% block content %}
+  <div class="article">
+    <h1>{{ article.title }}</h1>
+    <p><em>By {{ article.author.username }} on {{ article.created_at|date:"Y-m-d" }}</em></p>
+    <div class="content">
+      {{ article.content|linebreaks }}
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="comments">
+    <h2>Comments ({{ comments.count }})</h2>
+    {% for comment in comments %}
+      <div class="comment-item">
+        <strong>{{ comment.author.username }}</strong>
+        <small>({{ comment.created_at|timesince }} ago)</small>
+        <p>{{ comment.body|linebreaks }}</p>
+      </div>
+    {% empty %}
+      <p>No comments yet.</p>
+    {% endfor %}
+  </div>
+
+  <hr>
+
+  <div class="comment-form">
+    <h2>Add a Comment</h2>
+    {% if user.is_authenticated %}
+      <form method="POST">
+        {% csrf_token %}
+
+        {{ form.non_field_errors }}
+
+        <div class="form-group">
+          {{ form.body.errors }}
+          {{ form.body.label_tag }}
+          {{ form.body }}
+        </div>
+
+        <button type="submit">Post Comment</button>
+      </form>
+    {% else %}
+      <p>You must <a href="{% url 'login' %}">login</a> to post a comment.</p>
+    {% endif %}
+  </div>
+
+{% endblock %}
